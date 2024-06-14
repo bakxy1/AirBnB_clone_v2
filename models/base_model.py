@@ -14,7 +14,7 @@ class BaseModel:
         self.updated_at = datetime.now()
 
     def __str__(self) -> str:
-        return f"[{self.__class__.__name__}] ({self.id}) {self.to_dict()}"
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self) -> None:
         self.updated_at = datetime.now()
