@@ -5,6 +5,8 @@ from uuid import uuid4
 from copy import deepcopy
 from datetime import datetime
 
+from . import storage
+
 
 class BaseModel:
     """Parent class"""
@@ -22,6 +24,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = deepcopy(self.created_at)
+            storage.new(self)
 
     def __str__(self) -> str:
         """Overrides string method"""
@@ -30,6 +33,7 @@ class BaseModel:
     def save(self):
         """Updates update time attribute"""
         self.updated_at = datetime.now()
+        storage.save()
 
     def to_dict(self):
         """Return dictionary of instance"""
