@@ -1,26 +1,32 @@
+#!/usr/bin/python3
 """Defines the base model of a type"""
 
 from uuid import uuid4
-from datetime import datetime
 from copy import deepcopy
+from datetime import datetime
 
 
 class BaseModel:
     """Parent class"""
 
-    def __init__(self) -> None:
+    def __init__(self):
+        """Constructor method"""
         self.id = str(uuid4())
         self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        self.updated_at = deepcopy(self.created_at)
 
     def __str__(self) -> str:
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+        """Overrides string method"""
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
 
-    def save(self) -> None:
+    def save(self):
+        """Updates update time attribute"""
         self.updated_at = datetime.now()
 
-    def to_dict(self) -> dict:
-        instance_dict = deepcopy(self.__dict__)
+    def to_dict(self):
+        """Return dictionary of instance"""
+        instance_dict = {}
+        instance_dict.update(self.__dict__)
 
         instance_dict["__class__"] = self.__class__.__name__
         instance_dict["created_at"] = self.created_at.isoformat()
