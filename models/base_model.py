@@ -9,11 +9,19 @@ from datetime import datetime
 class BaseModel:
     """Parent class"""
 
-    def __init__(self):
+    def __init__(self, *_, **kwargs):
         """Constructor method"""
-        self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = deepcopy(self.created_at)
+        if len(kwargs) != 0:
+            for k, v in kwargs.items():
+                if k != "__class__":
+                    if k == "created_at" or k == "updated_at":
+                        setattr(self, k, datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f"))
+                    else:
+                        setattr(self, k, v)
+        else:
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = deepcopy(self.created_at)
 
     def __str__(self) -> str:
         """Overrides string method"""
