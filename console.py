@@ -6,12 +6,13 @@ import sys
 
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
     """Interpreter class"""
 
-    classes = {"BaseModel": BaseModel}
+    __classes = {"BaseModel": BaseModel, "User": User}
 
     prompt = "(hbnb) " if sys.stdin.isatty() else ""
 
@@ -31,8 +32,8 @@ class HBNBCommand(cmd.Cmd):
         arguments = line.split(" ")
         if arguments[0] == "":
             print("** class name missing **")
-        elif arguments[0] == "BaseModel":
-            obj = BaseModel()
+        elif arguments[0] in HBNBCommand.__classes.keys():
+            obj = HBNBCommand.__classes.get(arguments[0])()
             obj.save()
             print(obj.id)
         else:
@@ -43,7 +44,7 @@ class HBNBCommand(cmd.Cmd):
         arguments = line.split(" ")
         if arguments[0] == "":
             print("** class name missing **")
-        elif arguments[0] != "BaseModel":
+        elif arguments[0] not in HBNBCommand.__classes.keys():
             print("** class doesn't exist **")
         elif len(arguments) == 1:
             print("** instance id missing **")
@@ -58,7 +59,7 @@ class HBNBCommand(cmd.Cmd):
         arguments = line.split(" ")
         if arguments[0] == "":
             print("** class name missing **")
-        elif arguments[0] != "BaseModel":
+        elif arguments[0] not in HBNBCommand.__classes.keys():
             print("** class doesn't exist **")
         elif len(arguments) == 1:
             print("** instance id missing **")
@@ -74,12 +75,12 @@ class HBNBCommand(cmd.Cmd):
         arguments = line.split(" ")
         if arguments[0] == "":
             print([str(inst) for inst in storage.all().values()])
-        elif arguments[0] == "BaseModel":
+        elif arguments[0] in HBNBCommand.__classes.keys():
             print(
                 [
                     str(storage.all()[key])
                     for key in storage.all().keys()
-                    if key.split(".")[0] == "BaseModel"
+                    if key.split(".")[0] == arguments[0]
                 ]
             )
         else:
@@ -90,7 +91,7 @@ class HBNBCommand(cmd.Cmd):
         arguments = line.split(" ")
         if arguments[0] == "":
             print("** class name missing **")
-        elif arguments[0] != "BaseModel":
+        elif arguments[0] not in HBNBCommand.__classes.keys():
             print("** class doesn't exist **")
         elif len(arguments) == 1:
             print("** instance id missing **")
