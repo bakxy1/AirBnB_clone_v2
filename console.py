@@ -30,20 +30,33 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, line: str) -> None:
         arg: list = line.split(".")
-        if arg[0] in HBNBCommand.__classes.keys() and arg[1] == "all()":
-            all = storage.all()
-            required_instances = [
-                v for k, v in all.items() if k.split(".")[0] == arg[0]
-            ]
-            print("[", end="")
-            for idx in range(len(required_instances)):
-                print(required_instances[idx], end="")
-                if idx + 1 != len(required_instances):
-                    print(", ", end="")
-            print("]")
+        required_instances = [
+            v for k, v in storage.all().items() if k.split(".")[0] == arg[0]
+        ]
+        if arg[0] in HBNBCommand.__classes.keys():
+            if arg[1] == "all()":
+                HBNBCommand.all(required_instances)
+            elif arg[1] == "count()":
+                print(len(required_instances))
 
         else:
             return super().default(line)
+
+    @staticmethod
+    def all(instances):
+        """Print all instances of required class"""
+        print("[", end="")
+        for idx in range(len(instances)):
+            print(instances[idx], end="")
+            if idx + 1 != len(instances):
+                print(", ", end="")
+        print("]")
+
+    @staticmethod
+    def show(instances, id):
+        for inst in instances:
+            if inst.id == id:
+                print(inst)
 
     def do_quit(self, line):
         """Quit command to exit the program"""
