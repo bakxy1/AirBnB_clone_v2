@@ -3,7 +3,6 @@
 import cmd
 import sys
 
-
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -28,6 +27,23 @@ class HBNBCommand(cmd.Cmd):
     }
 
     prompt = "(hbnb) " if sys.stdin.isatty() else ""
+
+    def default(self, line: str) -> None:
+        arg: list = line.split(".")
+        if arg[0] in HBNBCommand.__classes.keys() and arg[1] == "all()":
+            all = storage.all()
+            required_instances = [
+                v for k, v in all.items() if k.split(".")[0] == arg[0]
+            ]
+            print("[", end="")
+            for idx in range(len(required_instances)):
+                print(required_instances[idx], end="")
+                if idx + 1 != len(required_instances):
+                    print(", ", end="")
+            print("]")
+
+        else:
+            return super().default(line)
 
     def do_quit(self, line):
         """Quit command to exit the program"""
