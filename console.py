@@ -4,6 +4,7 @@ import cmd
 import sys
 
 from models import storage
+import re
 from models.base_model import BaseModel
 from models.user import User
 from models.amenity import Amenity
@@ -70,16 +71,42 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, line):
-        """Creates new instance of BaseModel"""
-        arguments = line.split(" ")
-        if arguments[0] == "":
+        """Create an object of any class"""
+        param_list = line.split()
+        if not line:
             print("** class name missing **")
-        elif arguments[0] in HBNBCommand.__classes.keys():
-            obj = HBNBCommand.__classes.get(arguments[0])()
-            obj.save()
-            print(obj.id)
-        else:
+            return
+        elif param_list[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
+            return
+        new_instance = HBNBCommand.__classes[param_list[0]]()
+
+        for param in param_list:
+            regex = re.compile(
+                r'\w+=("[-(\w)]+"$|'
+                + r'("(\\\")*\w+(\\\")*[^"]+\w+(\\\")*"$)|'
+                + r"((-)?\d+(\.\d+)?$))"
+            )
+            if re.match(regex, param):
+                try:
+                    int(param.split("=")[1])
+                    setattr(new_instance, param.split("=")[0], int(param.split("=")[1]))
+                except Exception:
+                    try:
+                        float(param.split("=")[1])
+                        setattr(
+                            new_instance,
+                            param.split("=")[0],
+                            float(param.split("=")[1]),
+                        )
+                    except Exception:
+                        setattr(
+                            new_instance,
+                            param.split("=")[0],
+                            param.split("=")[1][1:-1].replace("_", " "),
+                        )
+        new_instance.save()
+        print(new_instance.id)
 
     def do_show(self, line):
         """Prints string representation of an instance based on class name"""
