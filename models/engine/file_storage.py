@@ -15,9 +15,17 @@ class FileStorage:
         """Constructor"""
         pass
 
-    def all(self):
+    def all(self, cls=None):
         """Returns __objects"""
-        return self.__class__.__objects
+        cls_objects = {}
+        if not cls:
+            return self.__class__.__objects
+
+        for id, state in self.__class__.__objects.items():
+            if type(state) is cls:
+                cls_objects[id] = state
+
+        return cls_objects
 
     def new(self, obj):
         """Sets new object to __objects"""
@@ -60,3 +68,11 @@ class FileStorage:
                 self.__objects[k] = cls.get(k.split(".")[0])(**v)
         except Exception:
             pass
+
+    def delete(self, obj=None):
+        """Delete object from __objects dictinoary"""
+        if obj:
+            for k, v in self.__class__.__objects.items():
+                if obj is v:
+                    del self.__class__.__objects[k]
+                    break
