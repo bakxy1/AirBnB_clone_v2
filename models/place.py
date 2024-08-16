@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 """Module defines `Place` class"""
 
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 
-class Place(BaseModel):
+class Place(BaseModel, Base):
     """Place class"""
 
     __tablename__ = "places"
@@ -22,3 +22,6 @@ class Place(BaseModel):
     latitude = Column(Float, default=0, nullable=False)
     longitude = Column(Float, default=0, nullable=False)
     amenity_ids = []
+
+    city = relationship("City", back_populates="places")
+    user = relationship("User", back_populates="places")
