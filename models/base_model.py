@@ -4,15 +4,22 @@
 from uuid import uuid4
 from copy import deepcopy
 from datetime import datetime
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, String, DateTime
 
-from . import storage
+Base = declarative_base()
 
 
 class BaseModel:
     """Parent class"""
 
+    id = Column(String(60), nullable=False, primary_key=True)
+    created_at = Column(DateTime, default=datetime.utcnow())
+    updated_at = Column(DateTime, default=datetime.utcnow())
+
     def __init__(self, *_, **kwargs):
         """Constructor method"""
+
         if len(kwargs) != 0:
             for k, v in kwargs.items():
                 if k != "__class__":
@@ -24,7 +31,6 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = deepcopy(self.created_at)
-            storage.new(self)
 
     def __str__(self) -> str:
         """Overrides string method"""
@@ -32,7 +38,11 @@ class BaseModel:
 
     def save(self):
         """Updates update time attribute"""
+        from models import storage
+
         self.updated_at = datetime.now()
+
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
@@ -44,4 +54,12 @@ class BaseModel:
         instance_dict["created_at"] = self.created_at.isoformat()
         instance_dict["updated_at"] = self.updated_at.isoformat()
 
+        instance_dict.pop("_sa_instance_state", None)
+
         return instance_dict
+
+    def delete(self):
+        """Delete current instance from storage"""
+        from models import storage
+
+        storage.delete(self)

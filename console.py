@@ -30,6 +30,7 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) " if sys.stdin.isatty() else ""
 
     def default(self, line: str) -> None:
+        """Get all objects"""
         arg: list = line.split(".")
         required_instances = [
             v for k, v in storage.all().items() if k.split(".")[0] == arg[0]
