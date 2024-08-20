@@ -2,6 +2,8 @@
 """Module defines `Place` class"""
 
 from models.base_model import BaseModel, Base
+from models import storage, storage_t
+
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -25,3 +27,24 @@ class Place(BaseModel, Base):
 
     city = relationship("City", back_populates="places")
     user = relationship("User", back_populates="places")
+
+    if storage_t == "db":
+        reviews = relationship(
+            "Review",
+            back_populates="place",
+            cascade="all, delete, delete-orphan",
+        )
+    else:
+
+        @property
+        def reviews(self):
+            """Return cities in State"""
+            from models import storage
+
+            place_reviews = []
+
+            for _, v in storage.all():
+                if v.__class__.__name__ == "Review" and v.place_id == self.id:
+                    place_reviews.append(v)
+
+            return place_reviews
